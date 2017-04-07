@@ -105,10 +105,18 @@ class OneSignal
             ], $headers), $body);
 
             return json_decode($response->getBody(), true);
-        } catch (\Throwable $t) {
-            throw new OneSignalException($t->getMessage());
+        } catch (\Http\Client\Exception\NetworkException $j) {
+            return [
+                'status' => 'error',
+                'message' => $j->getMessage()
+            ];
         } catch (\Exception $e) {
-            throw new OneSignalException($e->getMessage());
+            $response = $e->getResponse();
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'statusCode' => $response->getStatusCode(),
+            ];
         }
     }
 
